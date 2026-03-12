@@ -100,71 +100,103 @@
     <script>
         // --- 1. RPG DATA & CONFIG ---
         
-        // Open World Map (Categories)
         const CATEGORIES = {
-            mind: { id: 'mind', name: 'Knowledge Realm', icon: 'fa-brain', color: 'text-purple-500', bg: 'bg-purple-500', skills: 'Lernen, Kritisches Denken, Sprachen', endSkills: 'Experte, Wissen lehren' },
-            career: { id: 'career', name: 'Career Kingdom', icon: 'fa-chess-king', color: 'text-blue-500', bg: 'bg-blue-500', skills: 'Kommunikation, Leadership, Strategie', endSkills: 'Team führen, Unternehmen gründen' },
-            finance: { id: 'finance', name: 'Finance District', icon: 'fa-city', color: 'text-yellow-500', bg: 'bg-yellow-500', skills: 'Budgeting, Investieren', endSkills: 'Passive Einkommen, Finanzielle Freiheit' },
-            health: { id: 'health', name: 'Health Arena', icon: 'fa-heartbeat', color: 'text-red-500', bg: 'bg-red-500', skills: 'Kraft, Ausdauer, Ernährung', endSkills: 'Elite Fitness, Maximale Energie' },
-            social: { id: 'social', name: 'Social World', icon: 'fa-globe-americas', color: 'text-pink-500', bg: 'bg-pink-500', skills: 'Empathie, Networking', endSkills: 'Mentor werden' },
-            creative: { id: 'creative', name: 'Creative Island', icon: 'fa-paint-brush', color: 'text-teal-500', bg: 'bg-teal-500', skills: 'Kunst, Musik, Schreiben', endSkills: 'Magnum Opus erschaffen' },
-            spirit: { id: 'spirit', name: 'Spirit Tree', icon: 'fa-yin-yang', color: 'text-indigo-500', bg: 'bg-indigo-500', skills: 'Achtsamkeit, Resilienz', endSkills: 'Innere Ruhe, Zen' }
+            mind: { id: 'mind', name: 'Knowledge Realm', icon: 'fa-brain', color: 'text-purple-500', bg: 'bg-purple-500', skills: 'Lernen, Fokus, Reflexion', endSkills: 'Weisheit, Universalgelehrter' },
+            career: { id: 'career', name: 'Career Kingdom', icon: 'fa-chess-king', color: 'text-blue-500', bg: 'bg-blue-500', skills: 'Produktivität, Netzwerken', endSkills: 'CEO, Mastermind' },
+            finance: { id: 'finance', name: 'Finance District', icon: 'fa-city', color: 'text-yellow-500', bg: 'bg-yellow-500', skills: 'Sparen, Budgeting', endSkills: 'Monopolist, Finanzielle Freiheit' },
+            health: { id: 'health', name: 'Health Arena', icon: 'fa-heartbeat', color: 'text-red-500', bg: 'bg-red-500', skills: 'Kraft, Ausdauer, Regeneration', endSkills: 'Titan, Unsterblich' },
+            social: { id: 'social', name: 'Social World', icon: 'fa-globe-americas', color: 'text-pink-500', bg: 'bg-pink-500', skills: 'Kommunikation, Empathie', endSkills: 'Charisma-Lord, Mentor' },
+            creative: { id: 'creative', name: 'Creative Island', icon: 'fa-paint-brush', color: 'text-teal-500', bg: 'bg-teal-500', skills: 'Kunst, Schöpferkraft', endSkills: 'Visionär, Virtuose' },
+            spirit: { id: 'spirit', name: 'Spirit Tree', icon: 'fa-yin-yang', color: 'text-indigo-500', bg: 'bg-indigo-500', skills: 'Achtsamkeit, Natur', endSkills: 'Erleuchteter, Zen-Meister' }
         };
 
-        // Actions (Clickable elements that increment counters)
+        // Erweiterte Aktionen (Über 30 Trackings)
         const ACTIONS = [
-            // Kleine Aktionen (10 XP)
-            { id: 'act_read', type: 'small', title: 'Lesen', cat: 'mind', xp: 10, icon: 'fa-book', counter: 'read_count' },
-            { id: 'act_learn', type: 'small', title: 'Lernen', cat: 'mind', xp: 10, icon: 'fa-graduation-cap', counter: 'learn_count' },
-            { id: 'act_meditate', type: 'small', title: 'Meditieren', cat: 'spirit', xp: 10, icon: 'fa-om', counter: 'meditate_count' },
-            { id: 'act_walk', type: 'small', title: 'Spazieren', cat: 'health', xp: 10, icon: 'fa-walking', counter: 'walk_count' },
-            { id: 'act_clean', type: 'small', title: 'Aufräumen', cat: 'creative', xp: 10, icon: 'fa-broom', counter: 'clean_count' },
-            
-            // Mittlere Aktionen (50 XP)
-            { id: 'act_workout', type: 'medium', title: 'Training', cat: 'health', xp: 50, icon: 'fa-dumbbell', counter: 'workout_count' },
+            // HEALTH
+            { id: 'act_water', type: 'small', title: '3L Wasser', cat: 'health', xp: 10, icon: 'fa-glass-water', counter: 'water_count' },
+            { id: 'act_sleep', type: 'small', title: '8h Schlaf', cat: 'health', xp: 10, icon: 'fa-bed', counter: 'sleep_count' },
+            { id: 'act_eat', type: 'small', title: 'Clean Eating', cat: 'health', xp: 10, icon: 'fa-apple-whole', counter: 'eat_count' },
+            { id: 'act_stretch', type: 'small', title: '15 Min Yoga', cat: 'health', xp: 10, icon: 'fa-child-reaching', counter: 'stretch_count' },
+            { id: 'act_cold', type: 'small', title: 'Kalt duschen', cat: 'health', xp: 10, icon: 'fa-snowflake', counter: 'cold_count' },
+            { id: 'act_walk', type: 'small', title: '10k Schritte', cat: 'health', xp: 10, icon: 'fa-shoe-prints', counter: 'walk_count' },
+            { id: 'act_workout', type: 'medium', title: '1h Training', cat: 'health', xp: 50, icon: 'fa-dumbbell', counter: 'workout_count' },
+
+            // MIND
+            { id: 'act_read', type: 'small', title: '30 Min Lesen', cat: 'mind', xp: 10, icon: 'fa-book', counter: 'read_count' },
+            { id: 'act_journal', type: 'small', title: 'Journaling', cat: 'mind', xp: 10, icon: 'fa-pen', counter: 'journal_count' },
+            { id: 'act_learn', type: 'small', title: '1h Lernen', cat: 'mind', xp: 10, icon: 'fa-graduation-cap', counter: 'learn_count' },
+            { id: 'act_podcast', type: 'small', title: 'Podcast hören', cat: 'mind', xp: 10, icon: 'fa-podcast', counter: 'podcast_count' },
+            { id: 'act_documentary', type: 'medium', title: 'Doku schauen', cat: 'mind', xp: 50, icon: 'fa-tv', counter: 'docu_count' },
+
+            // SPIRIT
+            { id: 'act_meditate', type: 'small', title: '15m Meditieren', cat: 'spirit', xp: 10, icon: 'fa-om', counter: 'meditate_count' },
+            { id: 'act_gratitude', type: 'small', title: 'Dankbarkeit', cat: 'spirit', xp: 10, icon: 'fa-hands-praying', counter: 'gratitude_count' },
+            { id: 'act_nature', type: 'small', title: 'Zeit i.d. Natur', cat: 'spirit', xp: 10, icon: 'fa-tree', counter: 'nature_count' },
+            { id: 'act_breath', type: 'medium', title: 'Atemübung', cat: 'spirit', xp: 50, icon: 'fa-wind', counter: 'breath_count' },
+            { id: 'act_detox', type: 'medium', title: '24h Dig. Detox', cat: 'spirit', xp: 50, icon: 'fa-mobile-screen-button', counter: 'detox_count' },
+
+            // CREATIVE
+            { id: 'act_clean', type: 'small', title: '15m Aufräumen', cat: 'creative', xp: 10, icon: 'fa-broom', counter: 'clean_count' },
+            { id: 'act_draw', type: 'small', title: 'Zeichnen/Kunst', cat: 'creative', xp: 10, icon: 'fa-palette', counter: 'draw_count' },
+            { id: 'act_write', type: 'small', title: 'Freies Schreiben', cat: 'creative', xp: 10, icon: 'fa-keyboard', counter: 'write_count' },
+            { id: 'act_music', type: 'medium', title: 'Musik/Instrum.', cat: 'creative', xp: 50, icon: 'fa-music', counter: 'music_count' },
+            { id: 'act_craft', type: 'medium', title: 'Basteln/DIY', cat: 'creative', xp: 50, icon: 'fa-hammer', counter: 'craft_count' },
+
+            // SOCIAL
+            { id: 'act_call', type: 'small', title: 'Jem. anrufen', cat: 'social', xp: 10, icon: 'fa-phone', counter: 'call_count' },
+            { id: 'act_compliment', type: 'small', title: 'Kompliment', cat: 'social', xp: 10, icon: 'fa-comment-dots', counter: 'compliment_count' },
+            { id: 'act_social', type: 'medium', title: '2h Quality Time', cat: 'social', xp: 50, icon: 'fa-user-friends', counter: 'social_count' },
+            { id: 'act_help', type: 'medium', title: 'Anderen helfen', cat: 'social', xp: 50, icon: 'fa-hands-helping', counter: 'help_count' },
+
+            // FINANCE
+            { id: 'act_track_exp', type: 'small', title: 'Ausgabe tracken', cat: 'finance', xp: 10, icon: 'fa-receipt', counter: 'expense_count' },
+            { id: 'act_nospend', type: 'small', title: 'No-Spend Day', cat: 'finance', xp: 10, icon: 'fa-wallet', counter: 'nospend_count' },
+            { id: 'act_save', type: 'medium', title: 'Sparen/Invest.', cat: 'finance', xp: 50, icon: 'fa-piggy-bank', counter: 'save_count' },
+            { id: 'act_edu_fin', type: 'medium', title: 'Finanzbildung', cat: 'finance', xp: 50, icon: 'fa-chart-line', counter: 'edufin_count' },
+
+            // CAREER
+            { id: 'act_inbox', type: 'small', title: 'Inbox Zero', cat: 'career', xp: 10, icon: 'fa-envelope-open', counter: 'inbox_count' },
             { id: 'act_deepwork', type: 'medium', title: '2h Deep Work', cat: 'career', xp: 50, icon: 'fa-laptop-code', counter: 'deepwork_count' },
-            { id: 'act_skill', type: 'medium', title: 'Skill üben', cat: 'mind', xp: 50, icon: 'fa-tools', counter: 'skill_count' },
-            
-            // Große Aktionen (250 XP)
+            { id: 'act_network', type: 'medium', title: 'Netzwerken', cat: 'career', xp: 50, icon: 'fa-handshake', counter: 'network_count' },
+            { id: 'act_meeting', type: 'medium', title: 'Effektives Meeting', cat: 'career', xp: 50, icon: 'fa-users-cog', counter: 'meeting_count' },
+
+            // MACRO / BOSS (Large & Legendary)
             { id: 'act_project', type: 'large', title: 'Projekt abschließen', cat: 'career', xp: 250, icon: 'fa-flag-checkered', counter: 'project_count', boss: true },
             { id: 'act_exam', type: 'large', title: 'Prüfung bestehen', cat: 'mind', xp: 250, icon: 'fa-file-signature', counter: 'exam_count', boss: true },
             { id: 'act_travel', type: 'large', title: 'Reise durchführen', cat: 'social', xp: 250, icon: 'fa-plane', counter: 'travel_count', boss: true },
-            
-            // Legendary Aktionen (1000 XP)
-            { id: 'act_degree', type: 'legendary', title: 'Studium/Ausbildung beenden', cat: 'mind', xp: 1000, icon: 'fa-user-graduate', counter: 'degree_count', boss: true },
+            { id: 'act_sidehustle', type: 'large', title: 'Nebeninkommen', cat: 'finance', xp: 250, icon: 'fa-hand-holding-dollar', counter: 'sidehustle_count', boss: true },
+            { id: 'act_degree', type: 'legendary', title: 'Studium beenden', cat: 'mind', xp: 1000, icon: 'fa-user-graduate', counter: 'degree_count', boss: true },
             { id: 'act_company', type: 'legendary', title: 'Firma gründen', cat: 'career', xp: 1000, icon: 'fa-building', counter: 'company_count', boss: true },
             { id: 'act_marathon', type: 'legendary', title: 'Marathon laufen', cat: 'health', xp: 1000, icon: 'fa-running', counter: 'marathon_count', boss: true },
-            { id: 'act_book', type: 'legendary', title: 'Buch schreiben', cat: 'creative', xp: 1000, icon: 'fa-book-open', counter: 'book_count', boss: true }
+            { id: 'act_book', type: 'legendary', title: 'Buch veröffentlichen', cat: 'creative', xp: 1000, icon: 'fa-book-open', counter: 'book_count', boss: true }
         ];
 
-        // Quests (Daily, Weekly, Monthly)
+        // Quests
         const QUESTS = [
             { id: 'qd1', period: 'daily', title: 'Workout absolvieren', xp: 50, cat: 'health' },
             { id: 'qd2', period: 'daily', title: '10 Seiten lesen', xp: 50, cat: 'mind' },
             { id: 'qd3', period: 'daily', title: 'Soziale Kontakte pflegen', xp: 50, cat: 'social' },
-            
             { id: 'qw1', period: 'weekly', title: 'Skill signifikant verbessern', xp: 300, cat: 'mind' },
             { id: 'qw2', period: 'weekly', title: 'Projekt voranbringen', xp: 300, cat: 'career' },
-            
             { id: 'qm1', period: 'monthly', title: 'Ganzes Buch gelesen', xp: 1000, cat: 'mind' },
             { id: 'qm2', period: 'monthly', title: 'Fitnessziel erreicht', xp: 1000, cat: 'health' }
         ];
 
-        // --- ACHIEVEMENT GENERATOR (With Auto-Unlock Tracking) ---
+        // --- MASS ACHIEVEMENT GENERATOR (1200+ Achievements) ---
         function genTiers(prefix, cat, titleTpl, descTpl, counterName, tiers) {
             return tiers.map((tier, i) => {
                 let tierClass = 'tier-bronze';
-                if (i >= 3) tierClass = 'tier-silver';
-                if (i >= 6) tierClass = 'tier-gold';
-                if (i >= 9) tierClass = 'tier-legendary';
+                if (i >= 8) tierClass = 'tier-silver';
+                if (i >= 16) tierClass = 'tier-gold';
+                if (i >= 24) tierClass = 'tier-legendary';
 
                 return {
                     id: `${prefix}_t${i+1}`,
                     cat: cat,
                     title: titleTpl.replace(/{t}/g, tier.toLocaleString('de-DE')),
                     desc: descTpl.replace(/{t}/g, tier.toLocaleString('de-DE')),
-                    xp: (i + 1) * 100 * (i >= 6 ? 2 : 1), // Scaling XP
-                    isBoss: i >= 6, // Gold/Legendary acts as Boss/Milestone
+                    xp: (i + 1) * 50 * (i >= 16 ? 2 : 1), // Scaling XP
+                    isBoss: i >= 26, // Only the very late stages are treated as Boss visual
                     reqCounter: counterName,
                     reqAmount: tier,
                     tierClass: tierClass
@@ -172,28 +204,73 @@
             });
         }
 
-        const standardCounts = [1, 5, 10, 25, 50, 100, 250, 500, 1000, 5000];
-        const macroCounts = [1, 2, 3, 5, 10]; // For big things like degrees
+        // EPIC COUNTS = 30 Stufen pro Aktion (Generiert hunderte Achievements pro Kategorie)
+        const epicCounts = [1, 2, 3, 5, 7, 10, 15, 20, 25, 30, 40, 50, 75, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000, 7500, 10000, 15000];
+        const macroCounts = [1, 2, 3, 5, 10, 15, 20, 25, 50, 100]; // Für große Dinge
 
         const ACHIEVEMENTS = [
-            // Auto-Achievements based on Actions
-            ...genTiers('ach_read', 'mind', 'Bücherwurm {t}', '{t}x Lesen Session absolviert', 'read_count', standardCounts),
-            ...genTiers('ach_lrn', 'mind', 'Schüler des Lebens {t}', '{t}x Neues gelernt', 'learn_count', standardCounts),
-            ...genTiers('ach_med', 'spirit', 'Zen Meister {t}', '{t}x Meditiert', 'meditate_count', standardCounts),
-            ...genTiers('ach_wlk', 'health', 'Wanderer {t}', '{t}x Spazieren gewesen', 'walk_count', standardCounts),
-            ...genTiers('ach_cln', 'creative', 'Ordnungshüter {t}', '{t}x Aufgeräumt', 'clean_count', standardCounts),
-            
-            ...genTiers('ach_wko', 'health', 'Maschine {t}', '{t}x Trainiert', 'workout_count', standardCounts),
-            ...genTiers('ach_dw', 'career', 'Deep Worker {t}', '{t}x Deep Work Sessions', 'deepwork_count', standardCounts),
+            // HEALTH (7x 30 = 210)
+            ...genTiers('ach_wat', 'health', 'Wassermann {t}', '{t}x 3L Wasser getrunken', 'water_count', epicCounts),
+            ...genTiers('ach_slp', 'health', 'Schlafmeister {t}', '{t}x 8h Schlaf bekommen', 'sleep_count', epicCounts),
+            ...genTiers('ach_eat', 'health', 'Vitalität {t}', '{t}x gesund gegessen', 'eat_count', epicCounts),
+            ...genTiers('ach_str', 'health', 'Gummibär {t}', '{t}x 15 Min Yoga/Dehnen', 'stretch_count', epicCounts),
+            ...genTiers('ach_cld', 'health', 'Eisbader {t}', '{t}x kalt geduscht', 'cold_count', epicCounts),
+            ...genTiers('ach_wlk', 'health', 'Wanderer {t}', '{t}x 10.000 Schritte gegangen', 'walk_count', epicCounts),
+            ...genTiers('ach_wko', 'health', 'Maschine {t}', '{t}x 1h trainiert', 'workout_count', epicCounts),
+
+            // MIND (5x 30 = 150)
+            ...genTiers('ach_read', 'mind', 'Bücherwurm {t}', '{t}x 30 Min gelesen', 'read_count', epicCounts),
+            ...genTiers('ach_lrn', 'mind', 'Schüler des Lebens {t}', '{t}x 1h Neues gelernt', 'learn_count', epicCounts),
+            ...genTiers('ach_jrn', 'mind', 'Reflektor {t}', '{t}x im Journal geschrieben', 'journal_count', epicCounts),
+            ...genTiers('ach_pod', 'mind', 'Zuhörer {t}', '{t}x Podcasts gehört', 'podcast_count', epicCounts),
+            ...genTiers('ach_doc', 'mind', 'Forscher {t}', '{t}x Dokus geschaut', 'docu_count', epicCounts),
+
+            // SPIRIT (5x 30 = 150)
+            ...genTiers('ach_med', 'spirit', 'Zen Meister {t}', '{t}x meditiert', 'meditate_count', epicCounts),
+            ...genTiers('ach_dtx', 'spirit', 'Offline {t}', '{t}x 24h Digital Detox', 'detox_count', epicCounts),
+            ...genTiers('ach_gra', 'spirit', 'Dankbarkeit {t}', '{t}x Dankbarkeit praktiziert', 'gratitude_count', epicCounts),
+            ...genTiers('ach_nat', 'spirit', 'Waldläufer {t}', '{t}x Zeit in der Natur', 'nature_count', epicCounts),
+            ...genTiers('ach_bre', 'spirit', 'Atem-Pro {t}', '{t}x Atemübungen', 'breath_count', epicCounts),
+
+            // CREATIVE (5x 30 = 150)
+            ...genTiers('ach_cln', 'creative', 'Ordnungshüter {t}', '{t}x 15 Min aufgeräumt', 'clean_count', epicCounts),
+            ...genTiers('ach_drw', 'creative', 'Picasso {t}', '{t}x gezeichnet/gemalt', 'draw_count', epicCounts),
+            ...genTiers('ach_wri', 'creative', 'Poet {t}', '{t}x geschrieben', 'write_count', epicCounts),
+            ...genTiers('ach_mus', 'creative', 'Virtuose {t}', '{t}x musiziert', 'music_count', epicCounts),
+            ...genTiers('ach_crf', 'creative', 'Handwerker {t}', '{t}x gebastelt/DIY', 'craft_count', epicCounts),
+
+            // SOCIAL (4x 30 = 120)
+            ...genTiers('ach_soc', 'social', 'Socializer {t}', '{t}x Quality Time verbracht', 'social_count', epicCounts),
+            ...genTiers('ach_cal', 'social', 'Verbunden {t}', '{t}x angerufen', 'call_count', epicCounts),
+            ...genTiers('ach_hlp', 'social', 'Samariter {t}', '{t}x anderen geholfen', 'help_count', epicCounts),
+            ...genTiers('ach_cmp', 'social', 'Charmeur {t}', '{t}x Komplimente gemacht', 'compliment_count', epicCounts),
+
+            // FINANCE (4x 30 = 120)
+            ...genTiers('ach_fex', 'finance', 'Buchhalter {t}', '{t}x Ausgaben getrackt', 'expense_count', epicCounts),
+            ...genTiers('ach_fsv', 'finance', 'Investor {t}', '{t}x Geld gespart/investiert', 'save_count', epicCounts),
+            ...genTiers('ach_nsp', 'finance', 'Minimalist {t}', '{t}x No-Spend Days', 'nospend_count', epicCounts),
+            ...genTiers('ach_fed', 'finance', 'Finanz-Nerd {t}', '{t}x Finanzbildung genossen', 'edufin_count', epicCounts),
+
+            // CAREER (4x 30 = 120)
+            ...genTiers('ach_dw', 'career', 'Deep Worker {t}', '{t}x 2h Deep Work absolviert', 'deepwork_count', epicCounts),
+            ...genTiers('ach_ibx', 'career', 'Inbox Zero {t}', '{t}x Posteingang geleert', 'inbox_count', epicCounts),
+            ...genTiers('ach_ntw', 'career', 'Netzwerker {t}', '{t}x genetzwerkt', 'network_count', epicCounts),
+            ...genTiers('ach_mtg', 'career', 'Meeting Pro {t}', '{t}x effektive Meetings', 'meeting_count', epicCounts),
+
+            // MACROS / PROJECTS (10x pro Kategorie = 80)
             ...genTiers('ach_prj', 'career', 'Projektmanager {t}', '{t}x Projekte abgeschlossen', 'project_count', macroCounts),
             ...genTiers('ach_trv', 'social', 'Weltenbummler {t}', '{t}x Reisen unternommen', 'travel_count', macroCounts),
+            ...genTiers('ach_exm', 'mind', 'Geprüft {t}', '{t}x Prüfungen bestanden', 'exam_count', macroCounts),
+            ...genTiers('ach_fsh', 'finance', 'Hustler {t}', '{t}x Nebeninkommen generiert', 'sidehustle_count', macroCounts),
             
-            // Manual Boss Achievements (Frühes Spiel, Midgame, Endgame)
-            { id: 'boss_1', cat: 'career', title: 'Erster Job', desc: 'Den ersten richtigen Job gelandet.', xp: 500, isBoss: true, tierClass: 'tier-bronze' },
-            { id: 'boss_2', cat: 'social', title: 'Beziehungskrise gemeistert', desc: 'Einen schweren Konflikt gelöst.', xp: 1000, isBoss: true, tierClass: 'tier-silver' },
-            { id: 'boss_3', cat: 'career', title: 'Karrierewechsel', desc: 'Kompletter Neuanfang im Beruf.', xp: 2000, isBoss: true, tierClass: 'tier-gold' },
-            { id: 'boss_4', cat: 'finance', title: '100k Vermögen', desc: '100.000 angespart/investiert.', xp: 5000, isBoss: true, tierClass: 'tier-gold' },
-            { id: 'boss_5', cat: 'social', title: 'Familie gründen', desc: 'Die ultimative soziale Quest.', xp: 10000, isBoss: true, tierClass: 'tier-legendary' }
+            // Manual Boss Achievements
+            { id: 'man_fin_1', cat: 'finance', title: 'Notgroschen', desc: '1.000€ als Sicherheit angespart.', xp: 300, isBoss: false, tierClass: 'tier-bronze' },
+            { id: 'man_fin_2', cat: 'finance', title: 'Erstes Investment', desc: 'Die erste Aktie / ETF gekauft.', xp: 400, isBoss: false, tierClass: 'tier-silver' },
+            { id: 'man_fin_3', cat: 'finance', title: 'Schuldenfrei', desc: 'Alle Konsumschulden abbezahlt.', xp: 1000, isBoss: true, tierClass: 'tier-gold' },
+            { id: 'man_car_1', cat: 'career', title: 'Beförderung', desc: 'Eine Stufe auf der Karriereleiter aufgestiegen.', xp: 800, isBoss: false, tierClass: 'tier-silver' },
+            { id: 'man_soc_1', cat: 'social', title: 'Event Host', desc: 'Eine große Feier oder ein Dinner veranstaltet.', xp: 300, isBoss: false, tierClass: 'tier-bronze' },
+            { id: 'man_cre_1', cat: 'creative', title: 'Erstes Werk', desc: 'Etwas Eigenes (Kunst, Text, Code) veröffentlicht.', xp: 500, isBoss: false, tierClass: 'tier-silver' },
+            { id: 'man_hea_1', cat: 'health', title: 'Erster Klimmzug', desc: 'Den ersten sauberen Klimmzug geschafft.', xp: 200, isBoss: false, tierClass: 'tier-bronze' }
         ];
 
         // --- 2. STATE MANAGEMENT ---
@@ -203,9 +280,9 @@
             prestige: 0,
             theme: 'dark',
             skills: {}, 
-            counters: {}, // { 'read_count': 12, 'workout_count': 5 }
+            counters: {}, 
             unlocked: {}, 
-            quests: { daily: {}, weekly: {}, monthly: {} }, // { questId: timestamp }
+            quests: { daily: {}, weekly: {}, monthly: {} },
             history: {} 
         };
 
@@ -259,18 +336,13 @@
         function getTimeKeys() {
             const d = new Date();
             const daily = d.toISOString().split('T')[0];
-            
-            // Weekly key (Year + Week number)
             const dWeek = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
             const dayNum = dWeek.getUTCDay() || 7;
             dWeek.setUTCDate(dWeek.getUTCDate() + 4 - dayNum);
             const yearStart = new Date(Date.UTC(dWeek.getUTCFullYear(),0,1));
             const weekNo = Math.ceil((((dWeek - yearStart) / 86400000) + 1)/7);
             const weekly = `${d.getFullYear()}-W${weekNo}`;
-            
-            // Monthly key
             const monthly = `${d.getFullYear()}-${d.getMonth()+1}`;
-            
             return { daily, weekly, monthly };
         }
 
@@ -284,7 +356,6 @@
             if (globalStats.level > state.level) {
                 state.level = globalStats.level;
                 showToast(`Level Up! Du bist jetzt Level ${state.level}`, 'gold');
-                checkPrestige();
             }
 
             if (categoryId && state.skills[categoryId]) {
@@ -301,30 +372,18 @@
             saveState();
         }
 
-        function checkPrestige() {
-            if (state.level >= 100 && state.prestige === 0) {
-                // Future implementation: Reset Modal
-                // state.prestige++; state.level = 1; state.totalXp = 0;
-            }
-        }
-
         // RPG Action System
         function doAction(actionId) {
             const action = ACTIONS.find(a => a.id === actionId);
             if (!action) return;
 
-            // Add XP
             addXp(action.xp, action.cat);
-            
-            // Increment Counter
             if (action.counter) {
                 state.counters[action.counter] = (state.counters[action.counter] || 0) + 1;
             }
 
             showToast(`+${action.xp} XP (${action.title})`, 'blue');
             saveState();
-            
-            // Check for auto-unlocks
             checkAutoAchievements();
             if(currentTab === 'quests') renderQuests();
         }
@@ -336,9 +395,7 @@
                     if (state.counters[ach.reqCounter] >= ach.reqAmount) {
                         state.unlocked[ach.id] = Date.now();
                         addXp(ach.xp, ach.cat);
-                        setTimeout(() => {
-                            showToast(`🏆 Errungenschaft: ${ach.title}!`, 'gold');
-                        }, 1000);
+                        setTimeout(() => { showToast(`🏆 Errungenschaft: ${ach.title}!`, 'gold'); }, 1000);
                         unlockedAny = true;
                     }
                 }
@@ -346,16 +403,14 @@
             if (unlockedAny) saveState();
         }
 
-        // Manual Unlock
         function unlockAchievement(id) {
             if (state.unlocked[id]) return;
             const ach = ACHIEVEMENTS.find(a => a.id === id);
-            if (!ach || ach.reqCounter) return; // Auto-achievements can't be clicked manually
+            if (!ach || ach.reqCounter) return; 
 
             state.unlocked[id] = Date.now();
             addXp(ach.xp, ach.cat);
             showToast(`Erfolg: ${ach.title} (+${ach.xp} XP)`, 'gold');
-            
             if (currentTab === 'categories') renderCategoryDetail(ach.cat);
         }
 
@@ -365,8 +420,7 @@
 
             const keys = getTimeKeys();
             const timeKey = keys[quest.period];
-
-            if (state.quests[quest.period][questId] === timeKey) return; // Already done
+            if (state.quests[quest.period][questId] === timeKey) return; 
 
             state.quests[quest.period][questId] = timeKey;
             addXp(quest.xp, quest.cat);
@@ -378,11 +432,9 @@
         function checkQuestResets() {
             const keys = getTimeKeys();
             let hasOpen = false;
-            
             QUESTS.forEach(q => {
                 if (state.quests[q.period][q.id] !== keys[q.period]) hasOpen = true;
             });
-            
             document.getElementById('daily-badge').style.display = hasOpen ? 'block' : 'none';
         }
 
@@ -394,25 +446,16 @@
         }
 
         function applyTheme() {
-            if (state.theme === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
+            if (state.theme === 'dark') document.documentElement.classList.add('dark');
+            else document.documentElement.classList.remove('dark');
         }
 
         function getEndgameTitle() {
             if (state.level < 20) return 'Novize';
             if (state.level < 50) return 'Abenteurer';
-            
-            // Endgame Titles based on highest skill
-            let highestCat = 'mind';
-            let maxLvl = 0;
+            let highestCat = 'mind', maxLvl = 0;
             Object.keys(CATEGORIES).forEach(k => {
-                if(state.skills[k].level > maxLvl) {
-                    maxLvl = state.skills[k].level;
-                    highestCat = k;
-                }
+                if(state.skills[k].level > maxLvl) { maxLvl = state.skills[k].level; highestCat = k; }
             });
 
             if (maxLvl >= 50 || state.prestige > 0) {
@@ -428,10 +471,8 @@
             const stats = calculateLevel(state.totalXp);
             document.getElementById('header-level').innerText = stats.level;
             document.getElementById('header-title').innerText = getEndgameTitle();
-
             const pct = (stats.currentXp / stats.requiredXp) * 100;
             document.getElementById('header-xp-bar').style.width = `${pct}%`;
-
             const prestigeBadge = document.getElementById('prestige-badge');
             if(state.prestige > 0) {
                 prestigeBadge.classList.remove('hidden');
@@ -443,9 +484,7 @@
             currentTab = tab;
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('tab-active', 'text-blue-500');
-                if (btn.dataset.tab === tab) {
-                    btn.classList.add('tab-active', 'text-blue-500');
-                }
+                if (btn.dataset.tab === tab) btn.classList.add('tab-active', 'text-blue-500');
             });
 
             const content = document.getElementById('app-content');
@@ -469,7 +508,6 @@
             toast.className = `fixed top-24 left-1/2 transform -translate-x-1/2 text-white px-4 py-2 rounded-full shadow-lg z-[70] transition-all duration-300 flex items-center space-x-2 bg-${colorType}-500`;
             toast.style.opacity = 1;
             toast.style.transform = 'translate(-50%, 0)';
-            
             setTimeout(() => {
                 toast.style.opacity = 0;
                 toast.style.transform = 'translate(-50%, -20px)';
@@ -494,7 +532,6 @@
                     <p class="text-gray-500 dark:text-gray-400">Dein Leben ist ein RPG. Farme XP.</p>
                 </div>
 
-                <!-- Global Card -->
                 <div class="bg-white dark:bg-darkcard rounded-2xl p-5 shadow-sm mb-6 border border-gray-100 dark:border-gray-800 relative overflow-hidden">
                     ${state.prestige > 0 || stats.level >= 50 ? '<div class="absolute -right-10 -top-10 opacity-10 text-9xl text-yellow-500"><i class="fas fa-crown"></i></div>' : ''}
                     <div class="flex justify-between items-end mb-2 relative z-10">
@@ -522,7 +559,6 @@
                     </div>
                 </div>
 
-                <!-- Recent Achievements -->
                 <h3 class="font-bold text-lg mb-3"><i class="fas fa-history text-gray-400 mr-2"></i> Letzte Erfolge</h3>
                 <div class="space-y-3">
             `;
@@ -633,6 +669,7 @@
                         <div class="mt-4 bg-black bg-opacity-20 p-3 rounded-lg backdrop-blur-sm">
                             <p class="text-xs uppercase tracking-wider opacity-80 mb-1">Skill Tree End-Skills:</p>
                             <p class="text-sm font-bold"><i class="fas fa-star text-yellow-300 mr-1 text-[10px]"></i> ${cat.endSkills}</p>
+                            <p class="text-[10px] mt-2 opacity-70">${unlockedCount} / ${catAchievements.length} Errungenschaften</p>
                         </div>
                     </div>
                 </div>
@@ -641,15 +678,25 @@
                 <div class="space-y-3">
             `;
 
+            // Filter down what to show so it doesn't crash DOM: Show unlocked + first 10 locked
+            let toShow = [];
+            let lockedCount = 0;
+            
             catAchievements.sort((a, b) => {
                 const aUnl = state.unlocked[a.id] ? 1 : 0;
                 const bUnl = state.unlocked[b.id] ? 1 : 0;
-                if (aUnl !== bUnl) return aUnl - bUnl;
-                return b.xp - a.xp;
+                if (aUnl !== bUnl) return aUnl - bUnl; // Locked at top
+                if (!aUnl && !bUnl) return a.reqAmount - b.reqAmount; // If locked, sort by lowest req amount first
+                return b.xp - a.xp; // If unlocked, sort by highest XP first
             });
 
             catAchievements.forEach(ach => {
                 const isUnlocked = !!state.unlocked[ach.id];
+                if (!isUnlocked) {
+                    lockedCount++;
+                    if (lockedCount > 15 && !ach.isBoss && !ach.id.startsWith('man_')) return; // Limit rendering for performance
+                }
+                
                 const tierClass = ach.tierClass || 'tier-bronze';
                 
                 const cardClass = isUnlocked 
@@ -660,12 +707,11 @@
                 const btnClass = isUnlocked
                     ? 'bg-green-500 text-white cursor-default'
                     : ach.reqCounter 
-                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed' // Auto-unlock only
+                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
                         : 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 hover:bg-blue-500 hover:text-white cursor-pointer click-animation';
 
                 const icon = isUnlocked ? 'fa-check' : (ach.reqCounter ? 'fa-lock' : 'fa-hand-pointer');
                 
-                // Progress string for auto-achievements
                 let progressStr = '';
                 if (!isUnlocked && ach.reqCounter) {
                     const current = state.counters[ach.reqCounter] || 0;
@@ -703,8 +749,6 @@
                     <h2 class="text-2xl font-bold mb-1">Actions & Quests</h2>
                     <p class="text-gray-500 dark:text-gray-400 text-sm">Führe Aktionen aus, um XP zu farmen und Auto-Achievements freizuschalten.</p>
                 </div>
-
-                <!-- ACTIONS GRID -->
             `;
 
             const actionTypes = [
@@ -718,13 +762,15 @@
                 const acts = ACTIONS.filter(a => a.type === type.id);
                 if(acts.length === 0) return;
 
+                const gridCols = type.id === 'small' ? 'grid-cols-3' : 'grid-cols-2';
+
                 html += `
                     <div class="mb-5">
                         <div class="flex justify-between items-end mb-2">
                             <h3 class="font-bold text-md">${type.name}</h3>
                             <span class="text-xs font-bold ${type.color} bg-opacity-20 ${type.bg} px-2 py-0.5 rounded">${type.xp}</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid ${gridCols} gap-2">
                 `;
 
                 acts.forEach(act => {
@@ -735,7 +781,7 @@
                         <button onclick="doAction('${act.id}')" class="bg-white dark:bg-darkcard border border-gray-200 dark:border-gray-700 rounded-xl p-3 flex flex-col items-center justify-center text-center shadow-sm hover:border-${cat.color.split('-')[1]}-500 hover:shadow-md transition-all click-animation relative overflow-hidden">
                             <div class="absolute inset-0 opacity-0 hover:opacity-10 bg-${cat.color.split('-')[1]}-500 transition-opacity"></div>
                             <i class="fas ${act.icon} text-2xl ${cat.color} mb-2"></i>
-                            <span class="text-xs font-bold leading-tight">${act.title}</span>
+                            <span class="text-[10px] sm:text-xs font-bold leading-tight">${act.title}</span>
                             ${clickCount ? `<span class="absolute top-1 right-2 text-[9px] text-gray-400 font-mono">x${clickCount}</span>` : ''}
                         </button>
                     `;
@@ -743,7 +789,6 @@
 
                 html += `</div></div>`;
             });
-
 
             // TIMED QUESTS
             html += `
@@ -790,7 +835,7 @@
             
             const unlocked = Object.keys(state.unlocked).map(id => {
                 return { ...ACHIEVEMENTS.find(a => a.id === id), date: state.unlocked[id] };
-            }).sort((a, b) => b.date - a.date);
+            }).sort((a, b) => b.date - a.date).slice(0, 50); // Limit timeline rendering
 
             let html = `
                 <h2 class="text-2xl font-bold mb-6">Lebens-Timeline</h2>
@@ -801,6 +846,7 @@
                 html = `<h2 class="text-2xl font-bold mb-6">Lebens-Timeline</h2><p class="text-gray-500">Noch keine Historie vorhanden. Schließe Quests ab!</p>`;
             } else {
                 unlocked.forEach(ach => {
+                    if (!ach.title) return; // safety
                     const dateStr = new Date(ach.date).toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: 'numeric' });
                     const cat = CATEGORIES[ach.cat];
                     const tierClass = ach.tierClass || 'tier-bronze';
@@ -851,7 +897,6 @@
             });
 
             const totalAchUnlocked = Object.keys(state.unlocked).length;
-            const completionRate = Math.round((totalAchUnlocked / ACHIEVEMENTS.length) * 100) || 0;
 
             let html = `
                 <h2 class="text-2xl font-bold mb-6">RPG Statistiken</h2>
@@ -867,11 +912,11 @@
                     <div class="bg-white dark:bg-darkcard rounded-xl p-4 text-center border border-gray-100 dark:border-gray-800">
                         <i class="fas fa-trophy text-2xl text-yellow-500 mb-2"></i>
                         <p class="text-2xl font-bold">${totalAchUnlocked}</p>
-                        <p class="text-xs text-gray-500">Erfolge</p>
+                        <p class="text-xs text-gray-500">Erfolge (von ${ACHIEVEMENTS.length})</p>
                     </div>
                     <div class="bg-white dark:bg-darkcard rounded-xl p-4 text-center border border-gray-100 dark:border-gray-800">
                         <i class="fas fa-dragon text-2xl text-purple-500 mb-2"></i>
-                        <p class="text-2xl font-bold">${Object.keys(state.unlocked).filter(id => ACHIEVEMENTS.find(a => a.id === id)?.isBoss).length}</p>
+                        <p class="text-2xl font-bold">${Object.keys(state.unlocked).filter(id => ACHIEVEMENTS.find(a => a?.id === id)?.isBoss).length}</p>
                         <p class="text-xs text-gray-500">Bosse besiegt</p>
                     </div>
                     <div class="bg-white dark:bg-darkcard rounded-xl p-4 text-center border border-gray-100 dark:border-gray-800">
