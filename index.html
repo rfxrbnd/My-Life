@@ -1,133 +1,902 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Life-OS Dashboard v56</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Real Life Dashboard RPG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        darkbg: '#0f172a',
+                        darkcard: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --bg: #0a0a0c;
-            --card-bg: #16161a;
-            --accent: #00d4ff;
-            --success: #00ff88;
-            --text: #e0e0e0;
-        }
-        body { 
-            background-color: var(--bg); 
-            color: var(--text); 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            margin: 0; padding: 20px;
-        }
-        .dashboard { max-width: 1000px; margin: auto; }
-        header { text-align: center; border-bottom: 2px solid var(--accent); padding-bottom: 20px; margin-bottom: 30px; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        body { -webkit-tap-highlight-color: transparent; }
+        .tab-active { color: #3b82f6; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .progress-glow { box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+        .click-animation:active { transform: scale(0.95); }
         
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        
-        .category-card { 
-            background: var(--card-bg); 
-            border-radius: 12px; 
-            padding: 20px; 
-            border-left: 5px solid var(--accent);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-
-        .progress-container { background: #2a2a2e; border-radius: 10px; height: 12px; margin: 15px 0; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--success)); width: 0%; transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-
-        .achievement-btns { display: flex; flex-direction: column; gap: 8px; }
-        button { 
-            background: #252529; border: 1px solid #333; color: #bbb; 
-            padding: 10px; text-align: left; border-radius: 6px; cursor: pointer;
-            font-size: 0.9em; transition: 0.2s;
-        }
-        button:hover { background: #2d2d33; border-color: var(--accent); }
-        button.unlocked { 
-            border-color: var(--success); color: var(--success); 
-            background: rgba(0, 255, 136, 0.1); 
-        }
-        .stats { font-size: 0.8em; color: var(--accent); font-weight: bold; }
+        .tier-bronze { color: #cd7f32; border-color: #cd7f32; }
+        .tier-silver { color: #c0c0c0; border-color: #c0c0c0; }
+        .tier-gold { color: #ffd700; border-color: #ffd700; }
+        .tier-legendary { color: #ff00ff; border-color: #ff00ff; text-shadow: 0 0 5px rgba(255,0,255,0.5); }
     </style>
 </head>
-<body>
+<body class="bg-gray-100 dark:bg-darkbg text-gray-800 dark:text-gray-200 transition-colors duration-300 font-sans antialiased pb-20">
 
-<div class="dashboard">
-    <header>
-        <h1>SYSTEM STATUS: <span style="color:var(--accent)">ONLINE</span></h1>
-        <p>User Interface basierend auf Version 56 (Back to v39 + Features)</p>
+    <!-- Top Header -->
+    <header class="fixed top-0 w-full bg-white dark:bg-darkcard shadow-sm z-50 pt-safe transition-colors duration-300">
+        <div class="px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold shadow-lg relative">
+                    <span id="header-level">1</span>
+                    <div class="absolute -bottom-1 -right-1 bg-yellow-400 text-xs text-black rounded-full w-4 h-4 flex items-center justify-center hidden" id="prestige-badge"><i class="fas fa-star text-[8px]"></i></div>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-none">Life Dashboard</h1>
+                    <p class="text-xs font-semibold text-purple-400" id="header-title">Novize</p>
+                </div>
+            </div>
+            <button onclick="toggleTheme()" class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 click-animation">
+                <i class="fas fa-moon dark:hidden"></i>
+                <i class="fas fa-sun hidden dark:block"></i>
+            </button>
+        </div>
+        <div class="h-1.5 w-full bg-gray-200 dark:bg-gray-700">
+            <div id="header-xp-bar" class="h-full bg-blue-500 transition-all duration-500 progress-glow" style="width: 0%"></div>
+        </div>
     </header>
 
-    <div class="grid">
-        <div class="category-card" id="cat-legacy">
-            <span class="stats">LEVEL: ARCHITEKT</span>
-            <h2>💻 Legacy (Arbeit)</h2>
-            <div class="progress-container"><div class="progress-fill" id="fill-legacy"></div></div>
-            <div class="achievement-btns" data-category="legacy">
-                <button onclick="unlock(this, 20, 'legacy')">Initialisierung v56</button>
-                <button onclick="unlock(this, 20, 'legacy')">Refactoring v39 Core</button>
-                <button onclick="unlock(this, 30, 'legacy')">5 Major Features Implementiert</button>
-                <button onclick="unlock(this, 30, 'legacy')">Dokumentation Finalisiert</button>
-            </div>
-        </div>
+    <!-- Main Content Area -->
+    <main id="app-content" class="pt-20 px-4 pb-8 max-w-2xl mx-auto">
+        <!-- Content will be injected here via JS -->
+    </main>
 
-        <div class="category-card" id="cat-vitality">
-            <span class="stats">LEVEL: ATHLET</span>
-            <h2>⚡ Vitality (Fitness)</h2>
-            <div class="progress-container"><div class="progress-fill" id="fill-vitality"></div></div>
-            <div class="achievement-btns" data-category="vitality">
-                <button onclick="unlock(this, 25, 'vitality')">7 Tage Hydration (2L+)</button>
-                <button onclick="unlock(this, 25, 'vitality')">Work-out Streak (3 Tage)</button>
-                <button onclick="unlock(this, 25, 'vitality')">Schlaf-Rhythmus stabil</button>
-                <button onclick="unlock(this, 25, 'vitality')">Kein Fastfood für 1 Woche</button>
-            </div>
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 w-full bg-white dark:bg-darkcard border-t border-gray-200 dark:border-gray-800 pb-safe z-50 transition-colors duration-300">
+        <div class="flex justify-around items-center py-2">
+            <button onclick="navigate('home')" class="nav-btn flex flex-col items-center p-2 text-gray-500 dark:text-gray-400 tab-active" data-tab="home">
+                <i class="fas fa-home text-xl mb-1"></i>
+                <span class="text-[10px]">Home</span>
+            </button>
+            <button onclick="navigate('categories')" class="nav-btn flex flex-col items-center p-2 text-gray-500 dark:text-gray-400" data-tab="categories">
+                <i class="fas fa-globe text-xl mb-1"></i>
+                <span class="text-[10px]">World Map</span>
+            </button>
+            <button onclick="navigate('quests')" class="nav-btn flex flex-col items-center p-2 text-gray-500 dark:text-gray-400 relative" data-tab="quests">
+                <i class="fas fa-khanda text-xl mb-1"></i>
+                <span class="text-[10px]">Actions & Quests</span>
+                <span id="daily-badge" class="absolute top-1 right-2 w-2 h-2 bg-red-500 rounded-full hidden"></span>
+            </button>
+            <button onclick="navigate('timeline')" class="nav-btn flex flex-col items-center p-2 text-gray-500 dark:text-gray-400" data-tab="timeline">
+                <i class="fas fa-stream text-xl mb-1"></i>
+                <span class="text-[10px]">Timeline</span>
+            </button>
+            <button onclick="navigate('stats')" class="nav-btn flex flex-col items-center p-2 text-gray-500 dark:text-gray-400" data-tab="stats">
+                <i class="fas fa-chart-pie text-xl mb-1"></i>
+                <span class="text-[10px]">Stats</span>
+            </button>
         </div>
+    </nav>
 
-        <div class="category-card" id="cat-social">
-            <span class="stats">LEVEL: DIPLOMAT</span>
-            <h2>🤝 Social (Gilde)</h2>
-            <div class="progress-container"><div class="progress-fill" id="fill-social"></div></div>
-            <div class="achievement-btns" data-category="social">
-                <button onclick="unlock(this, 25, 'social')">Qualitätszeit mit Familie</button>
-                <button onclick="unlock(this, 25, 'social')">Alten Freund kontaktiert</button>
-                <button onclick="unlock(this, 25, 'social')">Netzwerk-Event besucht</button>
-                <button onclick="unlock(this, 50, 'social')">Mentor-Session / Hilfe gegeben</button>
-            </div>
-        </div>
-
-        <div class="category-card" id="cat-mindset">
-            <span class="stats">LEVEL: ZEN-MEISTER</span>
-            <h2>🧘 Mindset (Fokus)</h2>
-            <div class="progress-container"><div class="progress-fill" id="fill-mindset"></div></div>
-            <div class="achievement-btns" data-category="mindset">
-                <button onclick="unlock(this, 20, 'mindset')">10 Min Meditation</button>
-                <button onclick="unlock(this, 30, 'mindset')">Deep Work (2 Std. ohne Handy)</button>
-                <button onclick="unlock(this, 25, 'mindset')">Ein Sachbuch-Kapitel gelesen</button>
-                <button onclick="unlock(this, 25, 'mindset')">Tagesziele schriftlich fixiert</button>
-            </div>
-        </div>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-24 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-full shadow-lg z-[70] transition-all duration-300 opacity-0 pointer-events-none flex items-center space-x-2">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-msg">Achievement unlocked!</span>
     </div>
-</div>
 
-<script>
-    const progressData = { legacy: 0, vitality: 0, social: 0, mindset: 0 };
+    <script>
+        // --- 1. RPG DATA & CONFIG ---
+        
+        // Open World Map (Categories)
+        const CATEGORIES = {
+            mind: { id: 'mind', name: 'Knowledge Realm', icon: 'fa-brain', color: 'text-purple-500', bg: 'bg-purple-500', skills: 'Lernen, Kritisches Denken, Sprachen', endSkills: 'Experte, Wissen lehren' },
+            career: { id: 'career', name: 'Career Kingdom', icon: 'fa-chess-king', color: 'text-blue-500', bg: 'bg-blue-500', skills: 'Kommunikation, Leadership, Strategie', endSkills: 'Team führen, Unternehmen gründen' },
+            finance: { id: 'finance', name: 'Finance District', icon: 'fa-city', color: 'text-yellow-500', bg: 'bg-yellow-500', skills: 'Budgeting, Investieren', endSkills: 'Passive Einkommen, Finanzielle Freiheit' },
+            health: { id: 'health', name: 'Health Arena', icon: 'fa-heartbeat', color: 'text-red-500', bg: 'bg-red-500', skills: 'Kraft, Ausdauer, Ernährung', endSkills: 'Elite Fitness, Maximale Energie' },
+            social: { id: 'social', name: 'Social World', icon: 'fa-globe-americas', color: 'text-pink-500', bg: 'bg-pink-500', skills: 'Empathie, Networking', endSkills: 'Mentor werden' },
+            creative: { id: 'creative', name: 'Creative Island', icon: 'fa-paint-brush', color: 'text-teal-500', bg: 'bg-teal-500', skills: 'Kunst, Musik, Schreiben', endSkills: 'Magnum Opus erschaffen' },
+            spirit: { id: 'spirit', name: 'Spirit Tree', icon: 'fa-yin-yang', color: 'text-indigo-500', bg: 'bg-indigo-500', skills: 'Achtsamkeit, Resilienz', endSkills: 'Innere Ruhe, Zen' }
+        };
 
-    function unlock(btn, value, category) {
-        if (!btn.classList.contains('unlocked')) {
-            btn.classList.add('unlocked');
-            btn.innerText = "✔ " + btn.innerText;
+        // Actions (Clickable elements that increment counters)
+        const ACTIONS = [
+            // Kleine Aktionen (10 XP)
+            { id: 'act_read', type: 'small', title: 'Lesen', cat: 'mind', xp: 10, icon: 'fa-book', counter: 'read_count' },
+            { id: 'act_learn', type: 'small', title: 'Lernen', cat: 'mind', xp: 10, icon: 'fa-graduation-cap', counter: 'learn_count' },
+            { id: 'act_meditate', type: 'small', title: 'Meditieren', cat: 'spirit', xp: 10, icon: 'fa-om', counter: 'meditate_count' },
+            { id: 'act_walk', type: 'small', title: 'Spazieren', cat: 'health', xp: 10, icon: 'fa-walking', counter: 'walk_count' },
+            { id: 'act_clean', type: 'small', title: 'Aufräumen', cat: 'creative', xp: 10, icon: 'fa-broom', counter: 'clean_count' },
             
-            progressData[category] = Math.min(100, progressData[category] + value);
-            document.getElementById(`fill-${category}`).style.width = progressData[category] + '%';
+            // Mittlere Aktionen (50 XP)
+            { id: 'act_workout', type: 'medium', title: 'Training', cat: 'health', xp: 50, icon: 'fa-dumbbell', counter: 'workout_count' },
+            { id: 'act_deepwork', type: 'medium', title: '2h Deep Work', cat: 'career', xp: 50, icon: 'fa-laptop-code', counter: 'deepwork_count' },
+            { id: 'act_skill', type: 'medium', title: 'Skill üben', cat: 'mind', xp: 50, icon: 'fa-tools', counter: 'skill_count' },
             
-            checkLevelUp(category);
-        }
-    }
+            // Große Aktionen (250 XP)
+            { id: 'act_project', type: 'large', title: 'Projekt abschließen', cat: 'career', xp: 250, icon: 'fa-flag-checkered', counter: 'project_count', boss: true },
+            { id: 'act_exam', type: 'large', title: 'Prüfung bestehen', cat: 'mind', xp: 250, icon: 'fa-file-signature', counter: 'exam_count', boss: true },
+            { id: 'act_travel', type: 'large', title: 'Reise durchführen', cat: 'social', xp: 250, icon: 'fa-plane', counter: 'travel_count', boss: true },
+            
+            // Legendary Aktionen (1000 XP)
+            { id: 'act_degree', type: 'legendary', title: 'Studium/Ausbildung beenden', cat: 'mind', xp: 1000, icon: 'fa-user-graduate', counter: 'degree_count', boss: true },
+            { id: 'act_company', type: 'legendary', title: 'Firma gründen', cat: 'career', xp: 1000, icon: 'fa-building', counter: 'company_count', boss: true },
+            { id: 'act_marathon', type: 'legendary', title: 'Marathon laufen', cat: 'health', xp: 1000, icon: 'fa-running', counter: 'marathon_count', boss: true },
+            { id: 'act_book', type: 'legendary', title: 'Buch schreiben', cat: 'creative', xp: 1000, icon: 'fa-book-open', counter: 'book_count', boss: true }
+        ];
 
-    function checkLevelUp(cat) {
-        if(progressData[cat] >= 100) {
-            console.log(`Bereich ${cat} vollständig gemeistert!`);
-        }
-    }
-</script>
+        // Quests (Daily, Weekly, Monthly)
+        const QUESTS = [
+            { id: 'qd1', period: 'daily', title: 'Workout absolvieren', xp: 50, cat: 'health' },
+            { id: 'qd2', period: 'daily', title: '10 Seiten lesen', xp: 50, cat: 'mind' },
+            { id: 'qd3', period: 'daily', title: 'Soziale Kontakte pflegen', xp: 50, cat: 'social' },
+            
+            { id: 'qw1', period: 'weekly', title: 'Skill signifikant verbessern', xp: 300, cat: 'mind' },
+            { id: 'qw2', period: 'weekly', title: 'Projekt voranbringen', xp: 300, cat: 'career' },
+            
+            { id: 'qm1', period: 'monthly', title: 'Ganzes Buch gelesen', xp: 1000, cat: 'mind' },
+            { id: 'qm2', period: 'monthly', title: 'Fitnessziel erreicht', xp: 1000, cat: 'health' }
+        ];
 
+        // --- ACHIEVEMENT GENERATOR (With Auto-Unlock Tracking) ---
+        function genTiers(prefix, cat, titleTpl, descTpl, counterName, tiers) {
+            return tiers.map((tier, i) => {
+                let tierClass = 'tier-bronze';
+                if (i >= 3) tierClass = 'tier-silver';
+                if (i >= 6) tierClass = 'tier-gold';
+                if (i >= 9) tierClass = 'tier-legendary';
+
+                return {
+                    id: `${prefix}_t${i+1}`,
+                    cat: cat,
+                    title: titleTpl.replace(/{t}/g, tier.toLocaleString('de-DE')),
+                    desc: descTpl.replace(/{t}/g, tier.toLocaleString('de-DE')),
+                    xp: (i + 1) * 100 * (i >= 6 ? 2 : 1), // Scaling XP
+                    isBoss: i >= 6, // Gold/Legendary acts as Boss/Milestone
+                    reqCounter: counterName,
+                    reqAmount: tier,
+                    tierClass: tierClass
+                };
+            });
+        }
+
+        const standardCounts = [1, 5, 10, 25, 50, 100, 250, 500, 1000, 5000];
+        const macroCounts = [1, 2, 3, 5, 10]; // For big things like degrees
+
+        const ACHIEVEMENTS = [
+            // Auto-Achievements based on Actions
+            ...genTiers('ach_read', 'mind', 'Bücherwurm {t}', '{t}x Lesen Session absolviert', 'read_count', standardCounts),
+            ...genTiers('ach_lrn', 'mind', 'Schüler des Lebens {t}', '{t}x Neues gelernt', 'learn_count', standardCounts),
+            ...genTiers('ach_med', 'spirit', 'Zen Meister {t}', '{t}x Meditiert', 'meditate_count', standardCounts),
+            ...genTiers('ach_wlk', 'health', 'Wanderer {t}', '{t}x Spazieren gewesen', 'walk_count', standardCounts),
+            ...genTiers('ach_cln', 'creative', 'Ordnungshüter {t}', '{t}x Aufgeräumt', 'clean_count', standardCounts),
+            
+            ...genTiers('ach_wko', 'health', 'Maschine {t}', '{t}x Trainiert', 'workout_count', standardCounts),
+            ...genTiers('ach_dw', 'career', 'Deep Worker {t}', '{t}x Deep Work Sessions', 'deepwork_count', standardCounts),
+            ...genTiers('ach_prj', 'career', 'Projektmanager {t}', '{t}x Projekte abgeschlossen', 'project_count', macroCounts),
+            ...genTiers('ach_trv', 'social', 'Weltenbummler {t}', '{t}x Reisen unternommen', 'travel_count', macroCounts),
+            
+            // Manual Boss Achievements (Frühes Spiel, Midgame, Endgame)
+            { id: 'boss_1', cat: 'career', title: 'Erster Job', desc: 'Den ersten richtigen Job gelandet.', xp: 500, isBoss: true, tierClass: 'tier-bronze' },
+            { id: 'boss_2', cat: 'social', title: 'Beziehungskrise gemeistert', desc: 'Einen schweren Konflikt gelöst.', xp: 1000, isBoss: true, tierClass: 'tier-silver' },
+            { id: 'boss_3', cat: 'career', title: 'Karrierewechsel', desc: 'Kompletter Neuanfang im Beruf.', xp: 2000, isBoss: true, tierClass: 'tier-gold' },
+            { id: 'boss_4', cat: 'finance', title: '100k Vermögen', desc: '100.000 angespart/investiert.', xp: 5000, isBoss: true, tierClass: 'tier-gold' },
+            { id: 'boss_5', cat: 'social', title: 'Familie gründen', desc: 'Die ultimative soziale Quest.', xp: 10000, isBoss: true, tierClass: 'tier-legendary' }
+        ];
+
+        // --- 2. STATE MANAGEMENT ---
+        let state = {
+            totalXp: 0,
+            level: 1,
+            prestige: 0,
+            theme: 'dark',
+            skills: {}, 
+            counters: {}, // { 'read_count': 12, 'workout_count': 5 }
+            unlocked: {}, 
+            quests: { daily: {}, weekly: {}, monthly: {} }, // { questId: timestamp }
+            history: {} 
+        };
+
+        let currentTab = 'home';
+        let currentCategory = null;
+
+        function initApp() {
+            Object.keys(CATEGORIES).forEach(k => {
+                if(!state.skills[k]) state.skills[k] = { xp: 0, level: 1 };
+            });
+            if(!state.counters) state.counters = {};
+            if(!state.quests) state.quests = { daily: {}, weekly: {}, monthly: {} };
+            
+            loadState();
+            applyTheme();
+            updateGlobalHeader();
+            navigate('home');
+            checkQuestResets();
+        }
+
+        function saveState() {
+            localStorage.setItem('lifeDashboardRPG', JSON.stringify(state));
+            updateGlobalHeader();
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('lifeDashboardRPG');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                state = { ...state, ...parsed };
+            }
+        }
+
+        // --- 3. CORE LOGIC ---
+        function getRequiredXp(level) {
+            return Math.floor(100 * Math.pow(1.5, level - 1));
+        }
+
+        function calculateLevel(xp) {
+            let lvl = 1;
+            let req = 100;
+            let tempXp = xp;
+            while (tempXp >= req) {
+                tempXp -= req;
+                lvl++;
+                req = Math.floor(100 * Math.pow(1.5, lvl - 1));
+            }
+            return { level: lvl, currentXp: tempXp, requiredXp: req };
+        }
+
+        function getTimeKeys() {
+            const d = new Date();
+            const daily = d.toISOString().split('T')[0];
+            
+            // Weekly key (Year + Week number)
+            const dWeek = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            const dayNum = dWeek.getUTCDay() || 7;
+            dWeek.setUTCDate(dWeek.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(dWeek.getUTCFullYear(),0,1));
+            const weekNo = Math.ceil((((dWeek - yearStart) / 86400000) + 1)/7);
+            const weekly = `${d.getFullYear()}-W${weekNo}`;
+            
+            // Monthly key
+            const monthly = `${d.getFullYear()}-${d.getMonth()+1}`;
+            
+            return { daily, weekly, monthly };
+        }
+
+        function addXp(amount, categoryId) {
+            const multiplier = 1 + (state.prestige * 0.1);
+            const finalXp = Math.floor(amount * multiplier);
+
+            state.totalXp += finalXp;
+            const globalStats = calculateLevel(state.totalXp);
+            
+            if (globalStats.level > state.level) {
+                state.level = globalStats.level;
+                showToast(`Level Up! Du bist jetzt Level ${state.level}`, 'gold');
+                checkPrestige();
+            }
+
+            if (categoryId && state.skills[categoryId]) {
+                state.skills[categoryId].xp += finalXp;
+                const catStats = calculateLevel(state.skills[categoryId].xp);
+                if (catStats.level > state.skills[categoryId].level) {
+                    state.skills[categoryId].level = catStats.level;
+                    showToast(`${CATEGORIES[categoryId].name} Lvl Up!`, CATEGORIES[categoryId].color.split('-')[1]);
+                }
+            }
+
+            const { daily } = getTimeKeys();
+            state.history[daily] = (state.history[daily] || 0) + finalXp;
+            saveState();
+        }
+
+        function checkPrestige() {
+            if (state.level >= 100 && state.prestige === 0) {
+                // Future implementation: Reset Modal
+                // state.prestige++; state.level = 1; state.totalXp = 0;
+            }
+        }
+
+        // RPG Action System
+        function doAction(actionId) {
+            const action = ACTIONS.find(a => a.id === actionId);
+            if (!action) return;
+
+            // Add XP
+            addXp(action.xp, action.cat);
+            
+            // Increment Counter
+            if (action.counter) {
+                state.counters[action.counter] = (state.counters[action.counter] || 0) + 1;
+            }
+
+            showToast(`+${action.xp} XP (${action.title})`, 'blue');
+            saveState();
+            
+            // Check for auto-unlocks
+            checkAutoAchievements();
+            if(currentTab === 'quests') renderQuests();
+        }
+
+        function checkAutoAchievements() {
+            let unlockedAny = false;
+            ACHIEVEMENTS.forEach(ach => {
+                if (!state.unlocked[ach.id] && ach.reqCounter) {
+                    if (state.counters[ach.reqCounter] >= ach.reqAmount) {
+                        state.unlocked[ach.id] = Date.now();
+                        addXp(ach.xp, ach.cat);
+                        setTimeout(() => {
+                            showToast(`🏆 Errungenschaft: ${ach.title}!`, 'gold');
+                        }, 1000);
+                        unlockedAny = true;
+                    }
+                }
+            });
+            if (unlockedAny) saveState();
+        }
+
+        // Manual Unlock
+        function unlockAchievement(id) {
+            if (state.unlocked[id]) return;
+            const ach = ACHIEVEMENTS.find(a => a.id === id);
+            if (!ach || ach.reqCounter) return; // Auto-achievements can't be clicked manually
+
+            state.unlocked[id] = Date.now();
+            addXp(ach.xp, ach.cat);
+            showToast(`Erfolg: ${ach.title} (+${ach.xp} XP)`, 'gold');
+            
+            if (currentTab === 'categories') renderCategoryDetail(ach.cat);
+        }
+
+        function completeQuest(questId) {
+            const quest = QUESTS.find(q => q.id === questId);
+            if (!quest) return;
+
+            const keys = getTimeKeys();
+            const timeKey = keys[quest.period];
+
+            if (state.quests[quest.period][questId] === timeKey) return; // Already done
+
+            state.quests[quest.period][questId] = timeKey;
+            addXp(quest.xp, quest.cat);
+            showToast(`Quest erfüllt: +${quest.xp} XP`, 'green');
+            saveState();
+            renderQuests();
+        }
+
+        function checkQuestResets() {
+            const keys = getTimeKeys();
+            let hasOpen = false;
+            
+            QUESTS.forEach(q => {
+                if (state.quests[q.period][q.id] !== keys[q.period]) hasOpen = true;
+            });
+            
+            document.getElementById('daily-badge').style.display = hasOpen ? 'block' : 'none';
+        }
+
+        // --- 4. UI & RENDERING ---
+        function toggleTheme() {
+            state.theme = state.theme === 'dark' ? 'light' : 'dark';
+            applyTheme();
+            saveState();
+        }
+
+        function applyTheme() {
+            if (state.theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        function getEndgameTitle() {
+            if (state.level < 20) return 'Novize';
+            if (state.level < 50) return 'Abenteurer';
+            
+            // Endgame Titles based on highest skill
+            let highestCat = 'mind';
+            let maxLvl = 0;
+            Object.keys(CATEGORIES).forEach(k => {
+                if(state.skills[k].level > maxLvl) {
+                    maxLvl = state.skills[k].level;
+                    highestCat = k;
+                }
+            });
+
+            if (maxLvl >= 50 || state.prestige > 0) {
+                if (['mind', 'creative'].includes(highestCat)) return '🧠 Great Mind';
+                if (['career', 'finance'].includes(highestCat)) return '🌍 World Builder';
+                if (['health', 'spirit'].includes(highestCat)) return '👑 Master of Self';
+                if (['social'].includes(highestCat)) return '⚡ Legend of Life';
+            }
+            return 'Meister';
+        }
+
+        function updateGlobalHeader() {
+            const stats = calculateLevel(state.totalXp);
+            document.getElementById('header-level').innerText = stats.level;
+            document.getElementById('header-title').innerText = getEndgameTitle();
+
+            const pct = (stats.currentXp / stats.requiredXp) * 100;
+            document.getElementById('header-xp-bar').style.width = `${pct}%`;
+
+            const prestigeBadge = document.getElementById('prestige-badge');
+            if(state.prestige > 0) {
+                prestigeBadge.classList.remove('hidden');
+                prestigeBadge.innerHTML = `<i class="fas fa-star text-[8px]"></i> ${state.prestige}`;
+            }
+        }
+
+        function navigate(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('tab-active', 'text-blue-500');
+                if (btn.dataset.tab === tab) {
+                    btn.classList.add('tab-active', 'text-blue-500');
+                }
+            });
+
+            const content = document.getElementById('app-content');
+            content.style.opacity = 0;
+            
+            setTimeout(() => {
+                if (tab === 'home') renderHome();
+                else if (tab === 'categories') renderCategories();
+                else if (tab === 'quests') renderQuests();
+                else if (tab === 'timeline') renderTimeline();
+                else if (tab === 'stats') renderStats();
+                
+                checkQuestResets();
+                content.style.opacity = 1;
+            }, 150);
+        }
+
+        function showToast(msg, colorType = 'green') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.className = `fixed top-24 left-1/2 transform -translate-x-1/2 text-white px-4 py-2 rounded-full shadow-lg z-[70] transition-all duration-300 flex items-center space-x-2 bg-${colorType}-500`;
+            toast.style.opacity = 1;
+            toast.style.transform = 'translate(-50%, 0)';
+            
+            setTimeout(() => {
+                toast.style.opacity = 0;
+                toast.style.transform = 'translate(-50%, -20px)';
+            }, 3000);
+        }
+
+        // --- VIEWS ---
+        function renderHome() {
+            const content = document.getElementById('app-content');
+            const recent = Object.keys(state.unlocked)
+                .sort((a, b) => state.unlocked[b] - state.unlocked[a])
+                .slice(0, 3)
+                .map(id => ACHIEVEMENTS.find(a => a.id === id))
+                .filter(a => a);
+
+            const stats = calculateLevel(state.totalXp);
+            const title = getEndgameTitle();
+
+            let html = `
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold mb-1">Status Report</h2>
+                    <p class="text-gray-500 dark:text-gray-400">Dein Leben ist ein RPG. Farme XP.</p>
+                </div>
+
+                <!-- Global Card -->
+                <div class="bg-white dark:bg-darkcard rounded-2xl p-5 shadow-sm mb-6 border border-gray-100 dark:border-gray-800 relative overflow-hidden">
+                    ${state.prestige > 0 || stats.level >= 50 ? '<div class="absolute -right-10 -top-10 opacity-10 text-9xl text-yellow-500"><i class="fas fa-crown"></i></div>' : ''}
+                    <div class="flex justify-between items-end mb-2 relative z-10">
+                        <div>
+                            <p class="text-sm text-gray-500">Klasse: ${title}</p>
+                            <h3 class="text-4xl font-bold">Lvl ${stats.level}</h3>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-semibold text-blue-500">${stats.currentXp} / ${stats.requiredXp} XP</p>
+                        </div>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-4 relative z-10">
+                        <div class="bg-blue-500 h-3 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]" style="width: ${(stats.currentXp / stats.requiredXp) * 100}%"></div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 mt-4 relative z-10">
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 text-center border border-gray-100 dark:border-gray-700">
+                            <p class="text-xs text-gray-500 mb-1">Total XP</p>
+                            <p class="text-xl font-bold text-yellow-500">${state.totalXp}</p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 text-center border border-gray-100 dark:border-gray-700">
+                            <p class="text-xs text-gray-500 mb-1">Achievements</p>
+                            <p class="text-xl font-bold">${Object.keys(state.unlocked).length}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Achievements -->
+                <h3 class="font-bold text-lg mb-3"><i class="fas fa-history text-gray-400 mr-2"></i> Letzte Erfolge</h3>
+                <div class="space-y-3">
+            `;
+
+            if (recent.length === 0) {
+                html += `<p class="text-sm text-gray-500 italic">Noch keine Erfolge freigeschaltet. Klicke Quests!</p>`;
+            } else {
+                recent.forEach(ach => {
+                    const cat = CATEGORIES[ach.cat];
+                    const tierClass = ach.tierClass || 'tier-bronze';
+                    html += `
+                        <div class="bg-white dark:bg-darkcard rounded-xl p-3 flex items-center shadow-sm border border-gray-100 dark:border-gray-800 border-l-4 ${tierClass.replace('text-', 'border-')}">
+                            <div class="w-10 h-10 rounded-full ${cat.bg} text-white flex items-center justify-center mr-3 flex-shrink-0">
+                                <i class="fas ${cat.icon}"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <h4 class="font-bold text-sm ${tierClass}">${ach.title}</h4>
+                                <p class="text-xs text-gray-500 line-clamp-1">${ach.desc}</p>
+                            </div>
+                            <div class="text-right text-xs font-bold text-yellow-500">+${ach.xp}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            html += `</div>`;
+            content.innerHTML = html;
+        }
+
+        function renderCategories() {
+            const content = document.getElementById('app-content');
+            let html = `
+                <div class="mb-4">
+                    <h2 class="text-2xl font-bold">Open World Map</h2>
+                    <p class="text-sm text-gray-500">Erkunde deine Lebensbereiche & Skill Trees.</p>
+                </div>
+                <div class="space-y-4">
+            `;
+
+            Object.values(CATEGORIES).forEach(cat => {
+                const skill = state.skills[cat.id];
+                const stats = calculateLevel(skill.xp);
+                const pct = (stats.currentXp / stats.requiredXp) * 100;
+
+                html += `
+                    <div onclick="renderCategoryDetail('${cat.id}')" class="bg-white dark:bg-darkcard rounded-2xl p-4 shadow-sm cursor-pointer hover:scale-[1.02] transition-transform border border-gray-100 dark:border-gray-800 relative overflow-hidden group">
+                        <div class="absolute -right-4 -top-4 opacity-[0.05] text-8xl ${cat.color} group-hover:scale-110 transition-transform">
+                            <i class="fas ${cat.icon}"></i>
+                        </div>
+                        
+                        <div class="flex items-center mb-3">
+                            <div class="w-12 h-12 rounded-full ${cat.bg} text-white flex items-center justify-center mr-4 shadow-lg">
+                                <i class="fas ${cat.icon} text-xl"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <h3 class="font-bold text-lg leading-tight">${cat.name}</h3>
+                                <p class="text-sm font-semibold text-gray-500">Lvl ${stats.level}</p>
+                            </div>
+                            <div class="text-right">
+                                <i class="fas fa-chevron-right text-gray-300"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mb-3">
+                            <div class="${cat.bg} h-1.5 rounded-full" style="width: ${pct}%"></div>
+                        </div>
+
+                        <div class="text-xs text-gray-500 border-t border-gray-100 dark:border-gray-700 pt-2 flex justify-between">
+                            <span><i class="fas fa-code-branch mr-1"></i> ${cat.skills}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            content.innerHTML = html;
+        }
+
+        function renderCategoryDetail(catId) {
+            currentCategory = catId;
+            const content = document.getElementById('app-content');
+            const cat = CATEGORIES[catId];
+            const skill = state.skills[catId];
+            const stats = calculateLevel(skill.xp);
+            
+            const catAchievements = ACHIEVEMENTS.filter(a => a.cat === catId);
+            const unlockedCount = catAchievements.filter(a => state.unlocked[a.id]).length;
+
+            let html = `
+                <div class="flex items-center space-x-3 mb-6">
+                    <button onclick="renderCategories()" class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center click-animation">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h2 class="text-2xl font-bold">${cat.name}</h2>
+                </div>
+
+                <div class="${cat.bg} text-white rounded-2xl p-5 shadow-lg mb-6 relative overflow-hidden">
+                    <i class="fas ${cat.icon} absolute -right-4 -bottom-4 text-8xl opacity-20"></i>
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-end mb-2">
+                            <h3 class="text-4xl font-bold">Lvl ${stats.level}</h3>
+                            <p class="text-sm font-semibold bg-black bg-opacity-20 px-2 py-1 rounded">${stats.currentXp} / ${stats.requiredXp} XP</p>
+                        </div>
+                        <div class="w-full bg-black bg-opacity-30 rounded-full h-2 mb-3">
+                            <div class="bg-white h-2 rounded-full" style="width: ${(stats.currentXp / stats.requiredXp) * 100}%"></div>
+                        </div>
+                        
+                        <div class="mt-4 bg-black bg-opacity-20 p-3 rounded-lg backdrop-blur-sm">
+                            <p class="text-xs uppercase tracking-wider opacity-80 mb-1">Skill Tree End-Skills:</p>
+                            <p class="text-sm font-bold"><i class="fas fa-star text-yellow-300 mr-1 text-[10px]"></i> ${cat.endSkills}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="font-bold mb-3">Bereichs-Quests & Bossfights</h3>
+                <div class="space-y-3">
+            `;
+
+            catAchievements.sort((a, b) => {
+                const aUnl = state.unlocked[a.id] ? 1 : 0;
+                const bUnl = state.unlocked[b.id] ? 1 : 0;
+                if (aUnl !== bUnl) return aUnl - bUnl;
+                return b.xp - a.xp;
+            });
+
+            catAchievements.forEach(ach => {
+                const isUnlocked = !!state.unlocked[ach.id];
+                const tierClass = ach.tierClass || 'tier-bronze';
+                
+                const cardClass = isUnlocked 
+                    ? 'bg-gray-50 dark:bg-gray-800 opacity-60' 
+                    : ach.isBoss ? 'bg-gradient-to-r from-purple-900 to-darkcard border-purple-500 border-2 shadow-[0_0_15px_rgba(168,85,247,0.2)]' 
+                    : `bg-white dark:bg-darkcard border border-gray-100 dark:border-gray-800 border-l-4 ${tierClass.replace('text-', 'border-')} shadow-sm`;
+                
+                const btnClass = isUnlocked
+                    ? 'bg-green-500 text-white cursor-default'
+                    : ach.reqCounter 
+                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed' // Auto-unlock only
+                        : 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 hover:bg-blue-500 hover:text-white cursor-pointer click-animation';
+
+                const icon = isUnlocked ? 'fa-check' : (ach.reqCounter ? 'fa-lock' : 'fa-hand-pointer');
+                
+                // Progress string for auto-achievements
+                let progressStr = '';
+                if (!isUnlocked && ach.reqCounter) {
+                    const current = state.counters[ach.reqCounter] || 0;
+                    progressStr = `<p class="text-[10px] mt-1 text-gray-400">Fortschritt: ${current} / ${ach.reqAmount}</p>`;
+                }
+
+                html += `
+                    <div class="rounded-xl p-4 flex items-center ${cardClass}">
+                        <div class="flex-grow pr-4">
+                            <div class="flex items-center space-x-2">
+                                <h4 class="font-bold text-sm ${isUnlocked ? '' : tierClass}">${ach.title}</h4>
+                                ${ach.isBoss ? '<span class="text-[10px] bg-purple-500 text-white px-1.5 py-0.5 rounded shadow-[0_0_5px_rgba(168,85,247,0.8)]"><i class="fas fa-dragon mr-1"></i>BOSS</span>' : ''}
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">${ach.desc}</p>
+                            ${progressStr}
+                            <p class="text-xs font-semibold text-yellow-500 mt-1"><i class="fas fa-star text-[10px]"></i> ${ach.xp} XP</p>
+                        </div>
+                        <button onclick="${isUnlocked || ach.reqCounter ? '' : `unlockAchievement('${ach.id}')`}" class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${btnClass}">
+                            <i class="fas ${icon}"></i>
+                        </button>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            content.innerHTML = html;
+        }
+
+        function renderQuests() {
+            const content = document.getElementById('app-content');
+            const keys = getTimeKeys();
+            
+            let html = `
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold mb-1">Actions & Quests</h2>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">Führe Aktionen aus, um XP zu farmen und Auto-Achievements freizuschalten.</p>
+                </div>
+
+                <!-- ACTIONS GRID -->
+            `;
+
+            const actionTypes = [
+                { id: 'small', name: 'Kleine Aktionen', xp: '+10 XP', color: 'text-green-500', bg: 'bg-green-100 dark:bg-green-900' },
+                { id: 'medium', name: 'Mittlere Aktionen', xp: '+50 XP', color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900' },
+                { id: 'large', name: 'Große Aktionen', xp: '+250 XP', color: 'text-purple-500', bg: 'bg-purple-100 dark:bg-purple-900' },
+                { id: 'legendary', name: 'Legendäre Aktionen', xp: '+1000 XP', color: 'text-yellow-500', bg: 'bg-yellow-100 dark:bg-yellow-900' }
+            ];
+
+            actionTypes.forEach(type => {
+                const acts = ACTIONS.filter(a => a.type === type.id);
+                if(acts.length === 0) return;
+
+                html += `
+                    <div class="mb-5">
+                        <div class="flex justify-between items-end mb-2">
+                            <h3 class="font-bold text-md">${type.name}</h3>
+                            <span class="text-xs font-bold ${type.color} bg-opacity-20 ${type.bg} px-2 py-0.5 rounded">${type.xp}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                `;
+
+                acts.forEach(act => {
+                    const cat = CATEGORIES[act.cat];
+                    const clickCount = act.counter ? (state.counters[act.counter] || 0) : '';
+                    
+                    html += `
+                        <button onclick="doAction('${act.id}')" class="bg-white dark:bg-darkcard border border-gray-200 dark:border-gray-700 rounded-xl p-3 flex flex-col items-center justify-center text-center shadow-sm hover:border-${cat.color.split('-')[1]}-500 hover:shadow-md transition-all click-animation relative overflow-hidden">
+                            <div class="absolute inset-0 opacity-0 hover:opacity-10 bg-${cat.color.split('-')[1]}-500 transition-opacity"></div>
+                            <i class="fas ${act.icon} text-2xl ${cat.color} mb-2"></i>
+                            <span class="text-xs font-bold leading-tight">${act.title}</span>
+                            ${clickCount ? `<span class="absolute top-1 right-2 text-[9px] text-gray-400 font-mono">x${clickCount}</span>` : ''}
+                        </button>
+                    `;
+                });
+
+                html += `</div></div>`;
+            });
+
+
+            // TIMED QUESTS
+            html += `
+                <div class="mt-8 mb-4 border-t border-gray-200 dark:border-gray-800 pt-6">
+                    <h3 class="font-bold text-lg mb-1"><i class="fas fa-scroll text-yellow-600 mr-2"></i> Aktive Quests</h3>
+                </div>
+            `;
+
+            ['daily', 'weekly', 'monthly'].forEach(period => {
+                const qs = QUESTS.filter(q => q.period === period);
+                if(qs.length === 0) return;
+
+                const titles = { daily: 'Daily Quests', weekly: 'Weekly Quests', monthly: 'Monthly Quests' };
+                
+                html += `<h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mt-4 mb-2">${titles[period]}</h4><div class="space-y-2 mb-4">`;
+
+                qs.forEach(q => {
+                    const isDone = state.quests[period][q.id] === keys[period];
+                    const cat = CATEGORIES[q.cat];
+                    
+                    html += `
+                        <div class="bg-white dark:bg-darkcard rounded-xl p-3 flex items-center shadow-sm border border-gray-100 dark:border-gray-800 ${isDone ? 'opacity-50 bg-gray-50 dark:bg-gray-900' : ''}">
+                            <div class="w-8 h-8 rounded-full ${cat.bg} bg-opacity-20 ${cat.color} flex items-center justify-center mr-3 flex-shrink-0">
+                                <i class="fas ${cat.icon} text-sm"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <h4 class="font-bold text-sm ${isDone ? 'line-through' : ''}">${q.title}</h4>
+                                <p class="text-xs font-semibold text-yellow-500">+${q.xp} XP</p>
+                            </div>
+                            <button onclick="${isDone ? '' : `completeQuest('${q.id}')`}" class="w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all click-animation ${isDone ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 dark:border-gray-600 text-transparent hover:border-blue-500'}">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            });
+
+            content.innerHTML = html;
+        }
+
+        function renderTimeline() {
+            const content = document.getElementById('app-content');
+            
+            const unlocked = Object.keys(state.unlocked).map(id => {
+                return { ...ACHIEVEMENTS.find(a => a.id === id), date: state.unlocked[id] };
+            }).sort((a, b) => b.date - a.date);
+
+            let html = `
+                <h2 class="text-2xl font-bold mb-6">Lebens-Timeline</h2>
+                <div class="relative border-l-2 border-gray-200 dark:border-gray-700 ml-3 pl-5 space-y-6">
+            `;
+
+            if (unlocked.length === 0) {
+                html = `<h2 class="text-2xl font-bold mb-6">Lebens-Timeline</h2><p class="text-gray-500">Noch keine Historie vorhanden. Schließe Quests ab!</p>`;
+            } else {
+                unlocked.forEach(ach => {
+                    const dateStr = new Date(ach.date).toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: 'numeric' });
+                    const cat = CATEGORIES[ach.cat];
+                    const tierClass = ach.tierClass || 'tier-bronze';
+                    
+                    html += `
+                        <div class="relative">
+                            <div class="absolute -left-[29px] top-1 w-4 h-4 rounded-full ${cat.bg} border-4 border-white dark:border-darkbg ${ach.isBoss ? 'shadow-[0_0_8px_rgba(168,85,247,0.8)]' : ''}"></div>
+                            <p class="text-xs text-gray-400 mb-1">${dateStr}</p>
+                            <div class="bg-white dark:bg-darkcard rounded-xl p-3 shadow-sm border border-gray-100 dark:border-gray-800 ${ach.isBoss ? 'border-purple-500 bg-gradient-to-r from-purple-900 to-darkcard' : ''}">
+                                <h4 class="font-bold text-sm ${tierClass}">${ach.title} ${ach.isBoss ? '<i class="fas fa-dragon text-purple-400 text-xs ml-1"></i>' : ''}</h4>
+                                <p class="text-xs text-gray-500">${ach.desc}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            content.innerHTML = html;
+        }
+
+        function renderStats() {
+            const content = document.getElementById('app-content');
+            
+            const today = new Date();
+            let chartHtml = '';
+            let maxBar = 100;
+
+            const last7Days = [];
+            for(let i=6; i>=0; i--) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                const dStr = d.toISOString().split('T')[0];
+                const val = state.history[dStr] || 0;
+                last7Days.push({ label: d.toLocaleDateString('de-DE', {weekday: 'short'}), val: val });
+                if(val > maxBar) maxBar = val;
+            }
+
+            last7Days.forEach(day => {
+                const height = Math.max((day.val / maxBar) * 100, 5);
+                chartHtml += `
+                    <div class="flex flex-col items-center justify-end h-40 group relative w-full">
+                        <div class="absolute -top-6 hidden group-hover:block bg-black text-white text-[10px] py-1 px-2 rounded z-10">${day.val}</div>
+                        <div class="w-full max-w-[2rem] bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-md transition-all duration-500 hover:opacity-80 shadow-sm" style="height: ${height}%"></div>
+                        <span class="text-[10px] text-gray-500 mt-2">${day.label}</span>
+                    </div>
+                `;
+            });
+
+            const totalAchUnlocked = Object.keys(state.unlocked).length;
+            const completionRate = Math.round((totalAchUnlocked / ACHIEVEMENTS.length) * 100) || 0;
+
+            let html = `
+                <h2 class="text-2xl font-bold mb-6">RPG Statistiken</h2>
+                
+                <div class="bg-white dark:bg-darkcard rounded-2xl p-5 shadow-sm mb-6 border border-gray-100 dark:border-gray-800">
+                    <h3 class="font-bold text-sm mb-4">XP Grind (Letzte 7 Tage)</h3>
+                    <div class="flex justify-between items-end border-b border-gray-200 dark:border-gray-700 pb-2 space-x-1">
+                        ${chartHtml}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-white dark:bg-darkcard rounded-xl p-4 text-center border border-gray-100 dark:border-gray-800">
+                        <i class="fas fa-trophy text-2xl text-yellow-500 mb-2"></i>
+                        <p class="text-2xl font-bold">${totalAchUnlocked}</p>
+                        <p class="text-xs text-gray-500">Erfolge</p>
+                    </div>
+                    <div class="bg-white dark:bg-darkcard rounded-xl p-4 text-center border border-gray-100 dark:border-gray-800">
+                        <i class="fas fa-dragon text-2xl text-purple-500 mb-2"></i>
+                        <p class="text-2xl font-bold">${Object.keys(state.unlocked).filter(id => ACHIEVEMENTS.find(a => a.id === id)?.isBoss).length}</p>
+                        <p class="text-xs text-gray-500">Bosse besiegt</p>
+                    </div>
+                    <div class="bg-white dark:bg-darkcard rounded-xl p-4 text-center border border-gray-100 dark:border-gray-800">
+                        <i class="fas fa-fire text-2xl text-red-500 mb-2"></i>
+                        <p class="text-2xl font-bold">${state.totalXp}</p>
+                        <p class="text-xs text-gray-500">Gesamt XP</p>
+                    </div>
+                    <div class="bg-white dark:bg-darkcard rounded-xl p-4 text-center border border-gray-100 dark:border-gray-800 relative overflow-hidden">
+                        <i class="fas fa-crown text-2xl text-yellow-400 mb-2 relative z-10"></i>
+                        <p class="text-2xl font-bold relative z-10">${state.prestige}</p>
+                        <p class="text-xs text-gray-500 relative z-10">Prestige Level</p>
+                        ${state.prestige > 0 ? '<div class="absolute inset-0 bg-yellow-400 opacity-10 animate-pulse"></div>' : ''}
+                    </div>
+                </div>
+                
+                <button onclick="if(confirm('Wirklich alles löschen?')) { localStorage.removeItem('lifeDashboardRPG'); location.reload(); }" class="w-full p-3 text-red-500 border border-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-colors click-animation font-bold">
+                    <i class="fas fa-skull mr-2"></i> Spielstand löschen (Hard Reset)
+                </button>
+            `;
+
+            content.innerHTML = html;
+        }
+
+        // Run
+        initApp();
+    </script>
 </body>
 </html>
