@@ -2,74 +2,132 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Life Achievement System v56</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life-OS Dashboard v56</title>
     <style>
-        body { background: #0f0f12; color: #00ff41; font-family: 'Courier New', monospace; padding: 20px; }
-        .container { max-width: 800px; margin: auto; border: 2px solid #00ff41; padding: 20px; box-shadow: 0 0 15px #00ff41; }
-        h1 { text-align: center; text-transform: uppercase; letter-spacing: 5px; }
-        .skill-tree { margin-bottom: 30px; }
-        .category { margin: 20px 0; }
-        .progress-bar { width: 100%; background: #1a1a1a; border: 1px solid #00ff41; height: 25px; position: relative; }
-        .progress-fill { height: 100%; background: #00ff41; width: 0%; transition: width 0.5s ease-in-out; }
-        .percent-text { position: absolute; right: 10px; top: 2px; color: #fff; font-weight: bold; }
-        .achievement-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        button { background: transparent; border: 1px solid #00ff41; color: #00ff41; padding: 10px; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #00ff41; color: #000; }
-        button.unlocked { background: #00ff41; color: #000; opacity: 0.5; }
+        :root {
+            --bg: #0a0a0c;
+            --card-bg: #16161a;
+            --accent: #00d4ff;
+            --success: #00ff88;
+            --text: #e0e0e0;
+        }
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            margin: 0; padding: 20px;
+        }
+        .dashboard { max-width: 1000px; margin: auto; }
+        header { text-align: center; border-bottom: 2px solid var(--accent); padding-bottom: 20px; margin-bottom: 30px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        
+        .category-card { 
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            padding: 20px; 
+            border-left: 5px solid var(--accent);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .progress-container { background: #2a2a2e; border-radius: 10px; height: 12px; margin: 15px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--success)); width: 0%; transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        .achievement-btns { display: flex; flex-direction: column; gap: 8px; }
+        button { 
+            background: #252529; border: 1px solid #333; color: #bbb; 
+            padding: 10px; text-align: left; border-radius: 6px; cursor: pointer;
+            font-size: 0.9em; transition: 0.2s;
+        }
+        button:hover { background: #2d2d33; border-color: var(--accent); }
+        button.unlocked { 
+            border-color: var(--success); color: var(--success); 
+            background: rgba(0, 255, 136, 0.1); 
+        }
+        .stats { font-size: 0.8em; color: var(--accent); font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>System Status: v56</h1>
-    <hr color="#00ff41">
+<div class="dashboard">
+    <header>
+        <h1>SYSTEM STATUS: <span style="color:var(--accent)">ONLINE</span></h1>
+        <p>User Interface basierend auf Version 56 (Back to v39 + Features)</p>
+    </header>
 
-    <div class="skill-tree">
-        <div class="category">
-            <h3>LEGACY (Version 56 & Projekte)</h3>
-            <div class="progress-bar">
-                <div id="legacy-fill" class="progress-fill"></div>
-                <span id="legacy-percent" class="percent-text">0%</span>
+    <div class="grid">
+        <div class="category-card" id="cat-legacy">
+            <span class="stats">LEVEL: ARCHITEKT</span>
+            <h2>💻 Legacy (Arbeit)</h2>
+            <div class="progress-container"><div class="progress-fill" id="fill-legacy"></div></div>
+            <div class="achievement-btns" data-category="legacy">
+                <button onclick="unlock(this, 20, 'legacy')">Initialisierung v56</button>
+                <button onclick="unlock(this, 20, 'legacy')">Refactoring v39 Core</button>
+                <button onclick="unlock(this, 30, 'legacy')">5 Major Features Implementiert</button>
+                <button onclick="unlock(this, 30, 'legacy')">Dokumentation Finalisiert</button>
+            </div>
+        </div>
+
+        <div class="category-card" id="cat-vitality">
+            <span class="stats">LEVEL: ATHLET</span>
+            <h2>⚡ Vitality (Fitness)</h2>
+            <div class="progress-container"><div class="progress-fill" id="fill-vitality"></div></div>
+            <div class="achievement-btns" data-category="vitality">
+                <button onclick="unlock(this, 25, 'vitality')">7 Tage Hydration (2L+)</button>
+                <button onclick="unlock(this, 25, 'vitality')">Work-out Streak (3 Tage)</button>
+                <button onclick="unlock(this, 25, 'vitality')">Schlaf-Rhythmus stabil</button>
+                <button onclick="unlock(this, 25, 'vitality')">Kein Fastfood für 1 Woche</button>
+            </div>
+        </div>
+
+        <div class="category-card" id="cat-social">
+            <span class="stats">LEVEL: DIPLOMAT</span>
+            <h2>🤝 Social (Gilde)</h2>
+            <div class="progress-container"><div class="progress-fill" id="fill-social"></div></div>
+            <div class="achievement-btns" data-category="social">
+                <button onclick="unlock(this, 25, 'social')">Qualitätszeit mit Familie</button>
+                <button onclick="unlock(this, 25, 'social')">Alten Freund kontaktiert</button>
+                <button onclick="unlock(this, 25, 'social')">Netzwerk-Event besucht</button>
+                <button onclick="unlock(this, 50, 'social')">Mentor-Session / Hilfe gegeben</button>
+            </div>
+        </div>
+
+        <div class="category-card" id="cat-mindset">
+            <span class="stats">LEVEL: ZEN-MEISTER</span>
+            <h2>🧘 Mindset (Fokus)</h2>
+            <div class="progress-container"><div class="progress-fill" id="fill-mindset"></div></div>
+            <div class="achievement-btns" data-category="mindset">
+                <button onclick="unlock(this, 20, 'mindset')">10 Min Meditation</button>
+                <button onclick="unlock(this, 30, 'mindset')">Deep Work (2 Std. ohne Handy)</button>
+                <button onclick="unlock(this, 25, 'mindset')">Ein Sachbuch-Kapitel gelesen</button>
+                <button onclick="unlock(this, 25, 'mindset')">Tagesziele schriftlich fixiert</button>
             </div>
         </div>
     </div>
-
-    <h3>ACHIEVEMENTS FREISCHALTEN</h3>
-    <div class="achievement-list" id="achievements">
-        </div>
 </div>
 
 <script>
-    const data = [
-        { id: 1, text: "Erste Zeile Code (v56)", weight: 10 },
-        { id: 2, text: "Bug-Exorzist (5 Fixes)", weight: 20 },
-        { id: 3, text: "Feature-Master (v54 Import)", weight: 30 },
-        { id: 4, text: "Stabilitäts-Test (7 Tage)", weight: 20 },
-        { id: 5, text: "Doku-Held", weight: 20 }
-    ];
+    const progressData = { legacy: 0, vitality: 0, social: 0, mindset: 0 };
 
-    let currentProgress = 0;
-    const list = document.getElementById('achievements');
+    function unlock(btn, value, category) {
+        if (!btn.classList.contains('unlocked')) {
+            btn.classList.add('unlocked');
+            btn.innerText = "✔ " + btn.innerText;
+            
+            progressData[category] = Math.min(100, progressData[category] + value);
+            document.getElementById(`fill-${category}`).style.width = progressData[category] + '%';
+            
+            checkLevelUp(category);
+        }
+    }
 
-    data.forEach(item => {
-        const btn = document.createElement('button');
-        btn.innerText = `[ ] ${item.text}`;
-        btn.onclick = () => {
-            if(!btn.classList.contains('unlocked')) {
-                currentProgress += item.weight;
-                btn.classList.add('unlocked');
-                btn.innerText = `[✔] ${item.text}`;
-                updateUI();
-            }
-        };
-        list.appendChild(btn);
-    });
-
-    function updateUI() {
-        document.getElementById('legacy-fill').style.width = currentProgress + '%';
-        document.getElementById('legacy-percent').innerText = currentProgress + '%';
-        if(currentProgress >= 100) alert("LEVEL UP! Legacy Meisterschaft erreicht.");
+    function checkLevelUp(cat) {
+        if(progressData[cat] >= 100) {
+            console.log(`Bereich ${cat} vollständig gemeistert!`);
+        }
     }
 </script>
+
 </body>
 </html>
