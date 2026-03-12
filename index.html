@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Life Achievement System v56</title>
+    <style>
+        body { background: #0f0f12; color: #00ff41; font-family: 'Courier New', monospace; padding: 20px; }
+        .container { max-width: 800px; margin: auto; border: 2px solid #00ff41; padding: 20px; box-shadow: 0 0 15px #00ff41; }
+        h1 { text-align: center; text-transform: uppercase; letter-spacing: 5px; }
+        .skill-tree { margin-bottom: 30px; }
+        .category { margin: 20px 0; }
+        .progress-bar { width: 100%; background: #1a1a1a; border: 1px solid #00ff41; height: 25px; position: relative; }
+        .progress-fill { height: 100%; background: #00ff41; width: 0%; transition: width 0.5s ease-in-out; }
+        .percent-text { position: absolute; right: 10px; top: 2px; color: #fff; font-weight: bold; }
+        .achievement-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { background: transparent; border: 1px solid #00ff41; color: #00ff41; padding: 10px; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #00ff41; color: #000; }
+        button.unlocked { background: #00ff41; color: #000; opacity: 0.5; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>System Status: v56</h1>
+    <hr color="#00ff41">
+
+    <div class="skill-tree">
+        <div class="category">
+            <h3>LEGACY (Version 56 & Projekte)</h3>
+            <div class="progress-bar">
+                <div id="legacy-fill" class="progress-fill"></div>
+                <span id="legacy-percent" class="percent-text">0%</span>
+            </div>
+        </div>
+    </div>
+
+    <h3>ACHIEVEMENTS FREISCHALTEN</h3>
+    <div class="achievement-list" id="achievements">
+        </div>
+</div>
+
+<script>
+    const data = [
+        { id: 1, text: "Erste Zeile Code (v56)", weight: 10 },
+        { id: 2, text: "Bug-Exorzist (5 Fixes)", weight: 20 },
+        { id: 3, text: "Feature-Master (v54 Import)", weight: 30 },
+        { id: 4, text: "Stabilitäts-Test (7 Tage)", weight: 20 },
+        { id: 5, text: "Doku-Held", weight: 20 }
+    ];
+
+    let currentProgress = 0;
+    const list = document.getElementById('achievements');
+
+    data.forEach(item => {
+        const btn = document.createElement('button');
+        btn.innerText = `[ ] ${item.text}`;
+        btn.onclick = () => {
+            if(!btn.classList.contains('unlocked')) {
+                currentProgress += item.weight;
+                btn.classList.add('unlocked');
+                btn.innerText = `[✔] ${item.text}`;
+                updateUI();
+            }
+        };
+        list.appendChild(btn);
+    });
+
+    function updateUI() {
+        document.getElementById('legacy-fill').style.width = currentProgress + '%';
+        document.getElementById('legacy-percent').innerText = currentProgress + '%';
+        if(currentProgress >= 100) alert("LEVEL UP! Legacy Meisterschaft erreicht.");
+    }
+</script>
+</body>
+</html>
